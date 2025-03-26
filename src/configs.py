@@ -46,4 +46,6 @@ GHOST_SCATTER_TARGETS = {
     "inky": (31, 0),
     "clyde": (31, 30)
 }
-loading_screen_gif = "assets/other/loading.gif"
+
+import os
+loading_screen_gif = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/other/loading.gif"))

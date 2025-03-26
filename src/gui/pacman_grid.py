@@ -49,7 +49,8 @@ class PacmanGrid:
 
     def load_level(self, level_number):
         level_path = f"levels/level{level_number}.json"
-        level_json = self.get_json(level_path)
+        level_abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__),"..", "..", level_path))
+        level_json = self.get_json(level_abs_path)
         num_rows = level_json["num_rows"]
         num_cols = level_json["num_cols"]
         self.ghost_den = level_json['ghost_den']
