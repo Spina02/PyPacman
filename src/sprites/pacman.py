@@ -27,6 +27,8 @@ class Pacman(Sprite):
         self.screen = screen
         self.game_state = game_state
         self.pacman_pos = pacman_pos
+        self.game_state.pacman_rect = (pacman_pos[0], pacman_pos[1],
+                                       CELL_SIZE[0]*2, CELL_SIZE[0]*2)
         self.matrix = matrix
         self.start_pos = start_pos
         self.load_all_frames()

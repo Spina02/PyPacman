@@ -154,6 +154,10 @@ class GameState:
     
     def set_ghost_pos(self, name, val):
         self.__ghost_pos[name] = val
+        
+    @property
+    def ghosts(self):
+        return self.__ghost_pos
 
     @property
     def pacman_rect(self):

@@ -122,6 +122,7 @@ class Ghost(Sprite, ABC):
         dest = self._get_coords_from_idx(self.next_tile)
         self.rect_x, self.rect_y = self.lerp(source, dest)
         curr_mat_x, curr_mat_y = self._get_idx_from_coords((self.rect_x, self.rect_y))
+        self._game_state.set_ghost_pos(self.name, (curr_mat_x, curr_mat_y))
         if self.name == 'blinky':
             self._game_state.blinky_matrix_pos = (curr_mat_x, curr_mat_y)
         self.curr_pos = (curr_mat_x, curr_mat_y)
