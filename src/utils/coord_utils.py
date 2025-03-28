@@ -58,7 +58,7 @@ def get_tiny_matrix(matrix, cell_size, pacman_speed):
     tiny_r, tiny_c = 0, 0
     for row in matrix:
         for cell in row:
-            if cell != "wall":
+            if cell != "wall" and cell != "elec":
                 cell = "null"
             for sx in range(sub_div):
                 for sy in range(sub_div):
