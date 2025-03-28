@@ -5,7 +5,7 @@ from pygame.sprite import Sprite
 from pygame import Surface, USEREVENT
 from pygame.time import set_timer, get_ticks
 
-from src.configs import CELL_SIZE, PACMAN_SPEED, PACMAN, DOT_POINT, POWER_POINT
+from src.configs import CELL_SIZE, PACMAN_SPEED, PACMAN, DOT_POINT, POWER_POINT, NUM_ROWS, NUM_COLS
 from src.game.state_management import GameState
 from src.sprites.sprite_configs import *
 from src.utils.coord_utils import (get_coords_from_idx, 
@@ -126,7 +126,7 @@ class Pacman(Sprite):
                               col: int, 
                               additive: int):
         for r in range(self.subdiv * 2):
-            if self.tiny_matrix[row + r][col + additive] == "wall":
+            if self.tiny_matrix[row + r][col + additive] in ["wall", "elec"]:
                 return False
         return True
 
@@ -134,7 +134,7 @@ class Pacman(Sprite):
                                col: int, 
                                additive: int):
         for c in range(self.subdiv * 2):
-            if self.tiny_matrix[row + additive][col + c] == "wall":
+            if self.tiny_matrix[row + additive][col + c] in ["wall", "elec"]:
                 return False
         return True
 
@@ -165,12 +165,16 @@ class Pacman(Sprite):
                 self.sound.play_sound("dot")
                 self.collectibles -= 1
                 self.game_state.points += DOT_POINT
+                # Update the game state matrix
+                self.game_state.update_tile(r, c, "void")
             case "power":
                 self.matrix[r][c] = "void"
                 self.create_power_up_event()
                 self.sound.play_sound("dot")
                 self.collectibles -= 1
                 self.game_state.points += POWER_POINT
+                # Update the game state matrix
+                self.game_state.update_tile(r, c, "void")
                 
     def movement_bind(self):
         match self.game_state.direction:
@@ -222,6 +226,8 @@ class Pacman(Sprite):
             ):
                     self.rect_y += PACMAN_SPEED
                     self.tiny_start_x += 1
+                    
+        import numpy as np
 
         self.game_state.pacman_rect = (self.rect_x, self.rect_y, 
                                        CELL_SIZE[0]*2, CELL_SIZE[0]*2)

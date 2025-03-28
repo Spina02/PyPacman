@@ -1,7 +1,9 @@
 from src.configs import DOT_POINT
+import numpy as np
 
 class GameState:
     def __init__(self):
+        self._start_pos = None
         self.__level = 1
         self.__running = True
         self.__fps = 60
@@ -25,6 +27,15 @@ class GameState:
         self._mins_played = 0
         self._points = -DOT_POINT
         self._level_complete = False
+        self.level_matrix_np = None  # Numpy array of the level matrix
+        self.tile_encoding = {
+            "wall": 0,
+            "dot": 1,
+            "power": 2,
+            "void": 3,
+            "elec": 4
+        }
+        self.tile_decoding = {v: k for k, v in self.tile_encoding.items()}
 
     @property
     def level_complete(self):
@@ -208,3 +219,35 @@ class GameState:
     @fps.setter
     def fps(self, value):
         self.__fps = value
+
+    #? -------------------------------------------
+    #?             Custom properties
+    #? -------------------------------------------
+    
+    @property
+    def start_pos(self):
+        return self._start_pos
+    
+    @start_pos.setter
+    def start_pos(self, pos):
+        self._start_pos = pos
+    
+    #? -------------------------------------------
+    #?              Custom methods
+    #? -------------------------------------------
+
+    def set_level_matrix(self, matrix_list):
+        """
+        Set the level matrix as a numpy array
+        """
+        # Convert the matrix to a numpy array
+        for elem in matrix_list:
+            print(elem)
+        vectorize_encode = np.vectorize(lambda tile: self.tile_encoding.get(tile, -1))
+        self.level_matrix_np = vectorize_encode(np.array(matrix_list))
+    
+    def update_tile(self, row, col, new_tile):
+        """
+        Update a tile in the level matrix
+        """
+        self.level_matrix_np[row, col] = self.tile_encoding.get(new_tile, -1)

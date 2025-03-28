@@ -55,6 +55,7 @@ class PacmanGrid:
         num_cols = level_json["num_cols"]
         self.ghost_den = level_json['ghost_den']
         self._matrix = level_json["matrix"]
+        self._game_state.set_level_matrix(self._matrix)
         self._pacman_pos = level_json["pacman_start"]
         self.elec_pos = level_json['elec']
         self.mode_change_times = level_json['scatter_times']
@@ -69,6 +70,7 @@ class PacmanGrid:
             0.5,
             0.5,
         )
+        self._game_state.start_pos = self.start_x, self.start_y
         self._coord_matrix = precompute_matrix_coords(
             self.start_x, self.start_y, CELL_SIZE[0], num_rows, num_cols
         )
