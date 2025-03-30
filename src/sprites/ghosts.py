@@ -45,8 +45,9 @@ class Ghost(Sprite, ABC):
         self.num_cols = len(self._matrix[0])
         self._game_state = game_state
         self._is_released = False
-        self._creation_time = pytime.get_ticks()
-        self._dead_wait = GHOST_DELAYS[self.name]
+        #self._creation_time = pytime.get_ticks()
+        self._creation_step = game_state.step_count                                    #! modified here
+        self._dead_wait = GHOST_DELAYS[self.name] * self._game_state.fps // 1000       #! modified here
         self.move_direction_mapper = {"up": (-1, 0), "down":(2, 0), 
                                       "right": (0, 2), "left": (0, -1)}
         self.prev_pos = None
@@ -106,12 +107,15 @@ class Ghost(Sprite, ABC):
     def check_is_released(self):
         if self._is_released:
             return
-        curr_time = pytime.get_ticks()
-        if (curr_time - self._creation_time) > self._dead_wait:
+        # curr_time = pytime.get_ticks()
+        curr_time = self._game_state.step_count
+        # if (curr_time - self._creation_time) > self._dead_wait:
+        if (curr_time - self._creation_step) > self._dead_wait:
             self._is_released = True
-            self._dead_wait = 1500
+            self._dead_wait = 1500 * self._game_state.fps // 1000
             self.rect_x, self.rect_y = self._get_coords_from_idx((11, self._ghost_matrix_pos[1]))
-            self.release_time = pytime.get_ticks()
+            # self.release_time = pytime.get_ticks()
+            self.release_time = self._game_state.step_count
 
     def move_ghost(self):
         if not self._is_released:
@@ -253,7 +257,8 @@ class Ghost(Sprite, ABC):
         self.rect_x = x
         self.rect_y = y
         self._is_released = False
-        self._creation_time = pytime.get_ticks()
+        # self._creation_time = pytime.get_ticks()
+        self._creation_step = self._game_state.step_count
 
     def check_collisions(self):
         ghost_rect = Rect(self.rect.x, self.rect.y, 

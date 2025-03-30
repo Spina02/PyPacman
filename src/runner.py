@@ -35,7 +35,7 @@ class GameRun:
     def create_ghost_mode_event(self):
         CUSTOM_EVENT = pygame.USEREVENT + 1
         pygame.time.set_timer(CUSTOM_EVENT, 
-                              self.game_state.mode_change_events * 1000)
+                              self.game_state.mode_change_events * self.game_state.fps)
         self.game_state.custom_event = CUSTOM_EVENT
 
     def initialize_sounds(self):
@@ -73,6 +73,7 @@ class GameRun:
             pygame.display.flip()
             dt = clock.tick(self.game_state.fps)
             dt /= 100
+            self.game_state.step_count += 1
         self.update_highscore()
         pygame.quit()
         sys.exit()

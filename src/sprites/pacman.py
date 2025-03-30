@@ -153,7 +153,8 @@ class Pacman(Sprite):
                 self.game_state.scared_time)
         self.game_state.power_up_event = CUSTOM_EVENT
         self.game_state.is_pacman_powered = True
-        self.game_state.power_event_trigger_time = get_ticks()
+        self.game_state.power_event_trigger_time = self.game_state.step_count
+        #get_ticks()
 
     def eat_dots(self):
         r, c = get_idx_from_coords(

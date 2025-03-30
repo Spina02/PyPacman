@@ -16,6 +16,7 @@ class GameState:
         self._ghost_mode = 'scatter'
         self._mode_change_events = None
         self.__current_mode_index = 0
+        self.__mode_timer = 0
         self._custom_event = None
         self._pacman_direction = None
         self._blinky_matrix_pos = None
@@ -28,6 +29,7 @@ class GameState:
         self._points = -DOT_POINT
         self._level_complete = False
         self.level_matrix_np = None  # Numpy array of the level matrix
+        self._step_count = 0
         self.tile_encoding = {
             "wall": 0,
             "dot": 1,
@@ -231,6 +233,32 @@ class GameState:
     @start_pos.setter
     def start_pos(self, pos):
         self._start_pos = pos
+        
+    @property
+    def step_count(self):
+        return self._step_count
+    
+    @step_count.setter
+    def step_count(self, val):
+        self._step_count = val
+        
+    @property
+    def mode_change_times(self):
+        return self._mode_change_events
+    
+    @property
+    def current_mode_index(self):
+        return self.__current_mode_index
+    
+    @property
+    def mode_timer(self):
+        timer =  self.__mode_timer
+        self.__mode_timer -= 1
+        return timer
+    
+    @mode_timer.setter
+    def mode_timer(self, val):
+        self.__mode_timer = val
     
     #? -------------------------------------------
     #?              Custom methods
@@ -241,8 +269,6 @@ class GameState:
         Set the level matrix as a numpy array
         """
         # Convert the matrix to a numpy array
-        for elem in matrix_list:
-            print(elem)
         vectorize_encode = np.vectorize(lambda tile: self.tile_encoding.get(tile, -1))
         self.level_matrix_np = vectorize_encode(np.array(matrix_list))
     

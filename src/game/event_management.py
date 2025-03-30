@@ -20,25 +20,44 @@ class EventHandler:
             self._game_screen.direction = "u"
         elif key == K_DOWN:
             self._game_screen.direction = "d"
+            
+    def check_frame_events(self):
+        """Check for events that should happen based on frame count rather than real time"""
+        # Check for ghost mode changes
+        if self._game_screen.mode_timer < 0:
+            print("\n\nchanging mode\n\n")
+            # Time to change modes
+            next_mode = 'scatter' if self._game_screen.ghost_mode == 'chase' else 'chase'
+            self._game_screen.ghost_mode = next_mode
+            # Update the start time for the next mode
+            self._game_screen.mode_timer = self._game_screen.mode_change_events * self._game_screen.fps
 
-    def handle_events(self, event):
+        # Check for power-up expiration
+        if self._game_screen.is_pacman_powered:
+            power_duration = self._game_screen.scared_time
+            if self._game_screen.step_count >= self._game_screen.power_event_trigger_time + power_duration:
+                self._game_screen.is_pacman_powered = False
+
+    def handle_events(self, event, manual=True):
         if event.type == QUIT:
             self.pygame_quit()
 
-        if event.type == KEYDOWN:
+        if manual and event.type == KEYDOWN:
             self.key_bindings(event.key)
+            
+        self.check_frame_events()
         
-        if event.type == self._game_screen.custom_event:
-            curr_mode = self._game_screen.ghost_mode
-            if curr_mode == 'scatter':
-                self._game_screen.ghost_mode = 'chase'
-            elif curr_mode == 'chase':
-                self._game_screen.ghost_mode = 'scatter'
-            CUSTOM_EVENT = USEREVENT + 1
-            set_timer(CUSTOM_EVENT, 
-                                self._game_screen.mode_change_events * 1000)
-            self._game_screen.custom_event = CUSTOM_EVENT
+        # if event.type == self._game_screen.custom_event:
+        #     curr_mode = self._game_screen.ghost_mode
+        #     if curr_mode == 'scatter':
+        #         self._game_screen.ghost_mode = 'chase'
+        #     elif curr_mode == 'chase':
+        #         self._game_screen.ghost_mode = 'scatter'
+        #     CUSTOM_EVENT = USEREVENT + 1
+        #     set_timer(CUSTOM_EVENT, 
+        #                         self._game_screen.mode_change_events * self._game_screen.fps)
+        #     self._game_screen.custom_event = CUSTOM_EVENT
         
-        if event.type == self._game_screen.power_up_event:
-            self._game_screen.is_pacman_powered=False
+        # if event.type == self._game_screen.power_up_event:
+        #     self._game_screen.is_pacman_powered=True
 
