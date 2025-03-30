@@ -30,7 +30,7 @@ class EventHandler:
             self._game_screen.ghost_mode = next_mode
             # Update the start time for the next mode
             self._game_screen.mode_timer = self._game_screen.mode_change_events * self._game_screen.fps
-            print(f"\n\nchanging mode to {next_mode} for {self._game_screen.mode_timer} frames\n\n")
+            # print(f"\n\nchanging mode to {next_mode} for {self._game_screen.mode_timer} frames\n\n")
 
         # Check for power-up expiration
         if self._game_screen.is_pacman_powered:
