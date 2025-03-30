@@ -45,7 +45,7 @@ class EventHandler:
         if manual and event.type == KEYDOWN:
             self.key_bindings(event.key)
             
-        self.check_frame_events()
+        # self.check_frame_events()
         
         # if event.type == self._game_screen.custom_event:
         #     curr_mode = self._game_screen.ghost_mode

@@ -65,6 +65,7 @@ class GameRun:
             self.game_state.current_time = pygame.time.get_ticks()
             for event in pygame.event.get():
                 self.events.handle_events(event)
+            self.events.check_frame_events()
             self.screen.fill(Colors.BLACK)
             self.gui.draw_screens()
             self.all_sprites.draw(self.screen)
