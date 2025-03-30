@@ -62,7 +62,7 @@ class Ghost(Sprite, ABC):
         self.is_scared = False
         self.curr_pos = None
         self.release_time = None
-        self.sounds = SoundManager()
+        self.sounds = SoundManager(self._game_state.sound_enabled)
         self.load_images()
 
     def _get_coords_from_idx(self, p1):

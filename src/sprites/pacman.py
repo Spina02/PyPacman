@@ -37,7 +37,7 @@ class Pacman(Sprite):
         self.calculate_tiny_matrix()
         self.calculate_coord_matrix()
         self.frame_delay = 5
-        self.sound = SoundManager()
+        self.sound = SoundManager(self.game_state.sound_enabled)
         self.collectibles = self.count_dots_powers()
 
     def count_dots_powers(self):

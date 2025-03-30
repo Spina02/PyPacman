@@ -4,16 +4,17 @@ import pygame
 class SoundManager:
     _instance = None
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls, enabled = True, *args, **kwargs):
         if not cls._instance:
             cls._instance = super(SoundManager, cls).__new__(cls, *args, **kwargs)
         return cls._instance
 
-    def __init__(self):
+    def __init__(self, enable=True):
         if not hasattr(self, "_initialized"):
             self._initialized = True
             self._sounds = {}
             self._channels = {}
+            self._enable = enable
             self._background_music = None
             pygame.mixer.pre_init()
             pygame.mixer.set_num_channels(64)
@@ -32,16 +33,17 @@ class SoundManager:
 
     def play_sound(self, name):
         """Plays a specific sound effect."""
-        if name in self._sounds:
-            # if not pygame.mixer.get_busy():
-                now = pygame.time.get_ticks()
-                freq = self._sounds[name]['freq']
-                last_played = self._sounds[name]['last_played']
-                if now - last_played > freq: 
-                    self._channels[name].play(self._sounds[name]['sound'])
-                    self._sounds[name]['last_played'] = now
-        else:
-            print(f"Sound '{name}' not found!")
+        if self._enable:
+            if name in self._sounds:
+                # if not pygame.mixer.get_busy():
+                    now = pygame.time.get_ticks()
+                    freq = self._sounds[name]['freq']
+                    last_played = self._sounds[name]['last_played']
+                    if now - last_played > freq: 
+                        self._channels[name].play(self._sounds[name]['sound'])
+                        self._sounds[name]['last_played'] = now
+            else:
+                print(f"Sound '{name}' not found!")
 
     def set_background_music(self, filepath):
         """Loads and sets the background music."""

@@ -25,12 +25,12 @@ class EventHandler:
         """Check for events that should happen based on frame count rather than real time"""
         # Check for ghost mode changes
         if self._game_screen.mode_timer < 0:
-            print("\n\nchanging mode\n\n")
             # Time to change modes
             next_mode = 'scatter' if self._game_screen.ghost_mode == 'chase' else 'chase'
             self._game_screen.ghost_mode = next_mode
             # Update the start time for the next mode
             self._game_screen.mode_timer = self._game_screen.mode_change_events * self._game_screen.fps
+            print(f"\n\nchanging mode to {next_mode} for {self._game_screen.mode_timer} frames\n\n")
 
         # Check for power-up expiration
         if self._game_screen.is_pacman_powered:

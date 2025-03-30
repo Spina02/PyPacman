@@ -3,6 +3,7 @@ import numpy as np
 
 class GameState:
     def __init__(self):
+        self._sound_enabled = True
         self._start_pos = None
         self.__level = 1
         self.__running = True
@@ -13,7 +14,7 @@ class GameState:
         self.__ghost_pos = {}
         self.__is_loaded = False
         self.__is_pacman_powered = False
-        self._ghost_mode = 'scatter'
+        self._ghost_mode = 'chase'
         self._mode_change_events = None
         self.__current_mode_index = 0
         self.__mode_timer = 0
@@ -259,6 +260,14 @@ class GameState:
     @mode_timer.setter
     def mode_timer(self, val):
         self.__mode_timer = val
+        
+    @property
+    def sound_enabled(self):
+        return self._sound_enabled
+    
+    @sound_enabled.setter
+    def sound_enabled(self, val):
+        self._sound_enabled = val
     
     #? -------------------------------------------
     #?              Custom methods
