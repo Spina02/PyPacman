@@ -1,7 +1,6 @@
 from src.configs import *
 from src.gui.pacman_grid import *
 from src.gui.score_screen import ScoreScreen
-from src.log_handle import get_logger
 
 from pygame.time import wait
 
@@ -33,7 +32,6 @@ class ScreenManager:
             self.all_sprites.empty()
             self.pacman = PacmanGrid(self._screen, self._game_state)
             self.score_screen = ScoreScreen(self._screen, self._game_state)
-            logger.info("pacman grid created")
             self.all_sprites.add(self.pacman.pacman)
             for ghost in self.pacman.ghost.ghosts_list:
                 self.all_sprites.add(ghost)

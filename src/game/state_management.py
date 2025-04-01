@@ -23,6 +23,7 @@ class GameState:
         self._pacman_direction = None
         self._blinky_matrix_pos = None
         self._scared_time = None
+        self._scared_ghosts = [False, False, False, False]
         self._power_up_event = None
         self._power_event_trigger_time = None
         self._is_pacman_dead = False
@@ -38,6 +39,12 @@ class GameState:
             "power": 2,
             "void": 3,
             "elec": 4
+        }
+        self.ghost_encoding = {
+            "blinky": 0,
+            "pinky": 1,
+            "inky": 2,
+            "clyde": 3
         }
         self.tile_decoding = {v: k for k, v in self.tile_encoding.items()}
 
@@ -245,6 +252,14 @@ class GameState:
     @sound_enabled.setter
     def sound_enabled(self, val):
         self._sound_enabled = val
+        
+    @property
+    def scared_ghosts(self):
+        return self._scared_ghosts
+    @scared_ghosts.setter
+    def scared_ghosts(self, val):
+        self._scared_ghosts = val
+    
     
     #? -------------------------------------------
     #?              Custom methods

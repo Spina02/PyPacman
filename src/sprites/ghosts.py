@@ -208,6 +208,7 @@ class Ghost(Sprite, ABC):
     
     def make_ghost_scared(self):
         self._direction = self._direction_prevent[self._direction]
+        self._game_state.scared_ghosts[self._game_state.ghost_encoding[self.name]] = True
         self.is_scared = True
         self.prepare_movement()
 
