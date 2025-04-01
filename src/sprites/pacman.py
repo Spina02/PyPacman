@@ -1,20 +1,16 @@
-from math import ceil
-
 from pygame import image, transform
 from pygame.sprite import Sprite
 from pygame import Surface, USEREVENT
-from pygame.time import set_timer, get_ticks
+from pygame.time import set_timer
 
-from src.configs import CELL_SIZE, PACMAN_SPEED, PACMAN, DOT_POINT, POWER_POINT, NUM_ROWS, NUM_COLS
+from src.configs import CELL_SIZE, PACMAN_SPEED, PACMAN, DOT_POINT, POWER_POINT
 from src.game.state_management import GameState
-from src.sprites.sprite_configs import *
-from src.utils.coord_utils import (get_coords_from_idx, 
-                                   get_idx_from_coords, 
+from src.sprites.sprite_configs import PACMAN_PATHS
+from src.utils.coord_utils import (get_coords_from_idx,
+                                   get_idx_from_coords,
                                    get_tiny_matrix,
                                    precompute_matrix_coords)
 from src.sounds import SoundManager
-from src.log_handle import get_logger
-logger = get_logger(__name__)
 
 class Pacman(Sprite):
     def __init__(self, 
@@ -47,9 +43,8 @@ class Pacman(Sprite):
                 if col + 1 >= len(self.matrix[0]):
                     continue
                 if self.matrix[row][col] in ['dot', 'power'] and \
-                        self.matrix[row+1][col] not in ['wall', 'elec', 'null']:
+                   self.matrix[row+1][col] not in ['wall', 'elec', 'null']:
                     collectibles += 1
-        # logger.info("total_collectibles: %s",collectibles)
         return collectibles
 
     def load_image(self):
@@ -117,22 +112,19 @@ class Pacman(Sprite):
         self.tiny_start_y = self.pacman_pos[1] * self.subdiv
 
     def calculate_coord_matrix(self):
-        self.coord_matrix = precompute_matrix_coords(*self.start_pos,
+        self.coord_matrix = precompute_matrix_coords(self.start_pos[0],
+                                                     self.start_pos[1],
                                                      PACMAN_SPEED,
                                                      len(self.tiny_matrix),
                                                      len(self.tiny_matrix[0]))
 
-    def edges_helper_vertical(self, row: int, 
-                              col: int, 
-                              additive: int):
+    def edges_helper_vertical(self, row: int, col: int, additive: int):
         for r in range(self.subdiv * 2):
             if self.tiny_matrix[row + r][col + additive] in ["wall", "elec"]:
                 return False
         return True
 
-    def edge_helper_horizontal(self, row: int, 
-                               col: int, 
-                               additive: int):
+    def edge_helper_horizontal(self, row: int, col: int, additive: int):
         for c in range(self.subdiv * 2):
             if self.tiny_matrix[row + additive][col + c] in ["wall", "elec"]:
                 return False
@@ -142,23 +134,20 @@ class Pacman(Sprite):
         if (self.tiny_start_y + self.subdiv * 2) >= len(self.tiny_matrix[0]) - 1:
             self.tiny_start_y = 0
             self.rect_x = self.coord_matrix[self.tiny_start_x][0][0]
-
         elif (self.tiny_start_y - 1) < 0:
             self.tiny_start_y = len(self.tiny_matrix[0]) - (self.subdiv * 3)
-            self.rect_x = self.coord_matrix[self.tiny_start_x][-self.subdiv*2 - 4][0]
+            self.rect_x = self.coord_matrix[self.tiny_start_x][-self.subdiv * 2 - 4][0]
 
     def create_power_up_event(self):
         CUSTOM_EVENT = USEREVENT + 2
-        set_timer(CUSTOM_EVENT, 
-                self.game_state.scared_time)
+        set_timer(CUSTOM_EVENT, self.game_state.scared_time)
         self.game_state.power_up_event = CUSTOM_EVENT
         self.game_state.is_pacman_powered = True
         self.game_state.power_event_trigger_time = self.game_state.step_count
-        #get_ticks()
 
     def eat_dots(self):
         r, c = get_idx_from_coords(
-            self.rect.x, self.rect.y, *self.start_pos, CELL_SIZE[0]
+            self.rect.x, self.rect.y, self.start_pos[0], self.start_pos[1], CELL_SIZE[0]
         )
         match self.matrix[r][c]:
             case "dot":
@@ -166,7 +155,6 @@ class Pacman(Sprite):
                 self.sound.play_sound("dot")
                 self.collectibles -= 1
                 self.game_state.points += DOT_POINT
-                # Update the game state matrix
                 self.game_state.update_tile(r, c, "void")
             case "power":
                 self.matrix[r][c] = "void"
@@ -174,7 +162,6 @@ class Pacman(Sprite):
                 self.sound.play_sound("dot")
                 self.collectibles -= 1
                 self.game_state.points += POWER_POINT
-                # Update the game state matrix
                 self.game_state.update_tile(r, c, "void")
                 
     def movement_bind(self):
@@ -183,26 +170,19 @@ class Pacman(Sprite):
                 if self.edges_helper_vertical(self.tiny_start_x, self.tiny_start_y, -1):
                     self.move_direction = "l"
                     self.game_state.pacman_direction = 'l'
-            
             case 'r':
-                if self.edges_helper_vertical(
-                    self.tiny_start_x, self.tiny_start_y, self.subdiv * 2
-                ):
+                if self.edges_helper_vertical(self.tiny_start_x, self.tiny_start_y, self.subdiv * 2):
                     self.move_direction = "r"
                     self.game_state.pacman_direction = 'r'
-            
             case 'u':
                 if self.edge_helper_horizontal(self.tiny_start_x, self.tiny_start_y, -1):
                     self.move_direction = "u"
                     self.game_state.pacman_direction = 'u'
-            
             case 'd':
-                if self.edge_helper_horizontal(
-                    self.tiny_start_x, self.tiny_start_y, self.subdiv * 2
-                ):
-                    self.move_direction = "d" 
+                if self.edge_helper_horizontal(self.tiny_start_x, self.tiny_start_y, self.subdiv * 2):
+                    self.move_direction = "d"
                     self.game_state.pacman_direction = 'd'
- 
+
     def move_pacman(self, dt: float):
         match self.move_direction:
             case "l":
@@ -210,25 +190,17 @@ class Pacman(Sprite):
                     self.rect_x -= PACMAN_SPEED
                     self.tiny_start_y -= 1
             case "r":
-                if self.edges_helper_vertical(
-                self.tiny_start_x, self.tiny_start_y, self.subdiv * 2
-            ):
+                if self.edges_helper_vertical(self.tiny_start_x, self.tiny_start_y, self.subdiv * 2):
                     self.rect_x += PACMAN_SPEED
                     self.tiny_start_y += 1
-
             case "u":
                 if self.edge_helper_horizontal(self.tiny_start_x, self.tiny_start_y, -1):
                     self.rect_y -= PACMAN_SPEED
                     self.tiny_start_x -= 1
-            
             case "d":
-                if self.edge_helper_horizontal(
-                self.tiny_start_x, self.tiny_start_y, self.subdiv * 2
-            ):
+                if self.edge_helper_horizontal(self.tiny_start_x, self.tiny_start_y, self.subdiv * 2):
                     self.rect_y += PACMAN_SPEED
                     self.tiny_start_x += 1
-                    
-        import numpy as np
 
         self.game_state.pacman_rect = (self.rect_x, self.rect_y, 
                                        CELL_SIZE[0]*2, CELL_SIZE[0]*2)

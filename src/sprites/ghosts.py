@@ -10,9 +10,7 @@ Ghost movement class should need ghost coordinate pos, matrix, game state, some 
 from abc import abstractmethod, ABC
 
 from pygame.sprite import Sprite
-from pygame import Surface
-from pygame import image, transform
-import pygame.time as pytime
+from pygame import Surface, image, transform
 from pygame.time import wait
 from pygame.rect import Rect
 
@@ -24,9 +22,6 @@ from src.configs import PACMAN, CELL_SIZE, GHOST_DELAYS, GHOST_SCATTER_TARGETS, 
 from src.utils.coord_utils import get_coords_from_idx, get_idx_from_coords
 from src.utils.ghost_movement_utils import get_direction, get_is_intersection, get_is_move_valid
 from src.sounds import SoundManager
-
-from src.log_handle import get_logger
-logger = get_logger(__name__)
 
 class Ghost(Sprite, ABC):
     def __init__(self,
@@ -45,10 +40,9 @@ class Ghost(Sprite, ABC):
         self.num_cols = len(self._matrix[0])
         self._game_state = game_state
         self._is_released = False
-        #self._creation_time = pytime.get_ticks()
-        self._creation_step = game_state.step_count                                    #! modified here
-        self._dead_wait = GHOST_DELAYS[self.name] * self._game_state.fps // 1000       #! modified here
-        self.move_direction_mapper = {"up": (-1, 0), "down":(2, 0), 
+        self._creation_step = game_state.step_count
+        self._dead_wait = GHOST_DELAYS[self.name] * self._game_state.fps // 1000
+        self.move_direction_mapper = {"up": (-1, 0), "down": (2, 0),
                                       "right": (0, 2), "left": (0, -1)}
         self.prev_pos = None
         self._t = 0
@@ -57,8 +51,12 @@ class Ghost(Sprite, ABC):
         self._target = None
         self.prev = None
         self.next_tile = None
-        self._direction_prevent = {(-1, 0): (1, 0), (1, 0): (-1, 0),
-                                     (0, 1): (0, -1), (0, -1): (0, 1)}
+        self._direction_prevent = {
+            (-1, 0): (1, 0),
+            (1, 0): (-1, 0),
+            (0, 1): (0, -1),
+            (0, -1): (0, 1)
+        }
         self.is_scared = False
         self.curr_pos = None
         self.release_time = None
@@ -70,8 +68,7 @@ class Ghost(Sprite, ABC):
                                    *CELL_SIZE, self.num_rows, self.num_cols)
     
     def _get_idx_from_coords(self, p1):
-        return get_idx_from_coords(*p1,
-                                   *self._grid_start_pos, CELL_SIZE[0])
+        return get_idx_from_coords(*p1, *self._grid_start_pos, CELL_SIZE[0])
     
     def build_bounding_boxes(self, x, y):
         self.rect.x = x + (CELL_SIZE[0] * 2 - self.rect.width) // 2
@@ -80,10 +77,8 @@ class Ghost(Sprite, ABC):
     def load_images(self):
         ghost_images = GHOST_PATHS[self.name][0]
         blue_images = GHOST_PATHS['blue'][0]
-        self.normal_image = transform.scale(image.load(ghost_images).convert_alpha(),
-                                     PACMAN)
-        self.blue_image = transform.scale(image.load(blue_images).convert_alpha(),
-                                     PACMAN)
+        self.normal_image = transform.scale(image.load(ghost_images).convert_alpha(),PACMAN)
+        self.blue_image = transform.scale(image.load(blue_images).convert_alpha(),PACMAN)
         self.image = self.normal_image
         x, y = self._get_coords_from_idx(self._ghost_matrix_pos)
         self.rect = self.image.get_rect(topleft=(x, y))
@@ -98,8 +93,7 @@ class Ghost(Sprite, ABC):
         if self._t < 1:
             self._t += self._accelerate
         else:
-            self._t = 1  
-
+            self._t = 1
         x = (1 - self._t) * x1 + self._t * x2
         y = (1 - self._t) * y1 + self._t * y2
         return x, y
@@ -107,14 +101,11 @@ class Ghost(Sprite, ABC):
     def check_is_released(self):
         if self._is_released:
             return
-        # curr_time = pytime.get_ticks()
         curr_time = self._game_state.step_count
-        # if (curr_time - self._creation_time) > self._dead_wait:
         if (curr_time - self._creation_step) > self._dead_wait:
             self._is_released = True
             self._dead_wait = 1500 * self._game_state.fps // 1000
             self.rect_x, self.rect_y = self._get_coords_from_idx((11, self._ghost_matrix_pos[1]))
-            # self.release_time = pytime.get_ticks()
             self.release_time = self._game_state.step_count
 
     def move_ghost(self):
@@ -130,23 +121,20 @@ class Ghost(Sprite, ABC):
         if self.name == 'blinky':
             self._game_state.blinky_matrix_pos = (curr_mat_x, curr_mat_y)
         self.curr_pos = (curr_mat_x, curr_mat_y)
-        if (self._t == 1) \
-            or (self.rect_x == dest[0] and self.rect_y == dest[1]):
+        if (self._t == 1) or (self.rect_x == dest[0] and self.rect_y == dest[1]):
             check_prev = self._direction_prevent.get(self._direction)
             prev_val = self._get_direction_reverse_map(check_prev)
-            if get_is_intersection(self.next_tile, self._matrix, 
-                                   prev_val):
-                
+            if get_is_intersection(self.next_tile, self._matrix, prev_val):
                 self.prepare_movement()
             else:
-                if not get_is_move_valid(self.next_tile, 
-                                         self._get_direction_reverse_map(self._direction), 
+                if not get_is_move_valid(self.next_tile,
+                                         self._get_direction_reverse_map(self._direction),
                                          self._matrix):
                     self.prepare_movement()
                 else:
                     self.prev = self.next_tile
                     self.next_tile = (self.next_tile[0] + self._direction[0],
-                                  self.next_tile[1] + self._direction[1])
+                                      self.next_tile[1] + self._direction[1])
                 
                 self._t = 0
     
@@ -158,16 +146,15 @@ class Ghost(Sprite, ABC):
                 return "down"
             case (0, -1):
                 return "left"
-            case(0, 1):
+            case (0, 1):
                 return "right"
       
     def _boundary_check(self):
         if not self.next_tile:
             return
-        if (self.next_tile[1] >= self.num_cols):
+        if self.next_tile[1] >= self.num_cols:
             self.next_tile = (self.next_tile[0], 0)
-            return
-        if self.next_tile[1] < 0:
+        elif self.next_tile[1] < 0:
             self.next_tile = (self.next_tile[0], self.num_cols - 1)
 
     def prepare_movement(self):
@@ -180,12 +167,12 @@ class Ghost(Sprite, ABC):
             self._target = self.determine_target()
         prev = self._direction_prevent.get(self._direction)
         self._direction = get_direction((ghost_x, ghost_y),
-                                        self._target, 
-                                        self._matrix, 
+                                        self._target,
+                                        self._matrix,
                                         prev
                                         )
         self._t = 0
-        self.next_tile = (ghost_x + self._direction[0], 
+        self.next_tile = (ghost_x + self._direction[0],
                           ghost_y + self._direction[1])
         self.prev = (ghost_x, ghost_y)
 
@@ -194,15 +181,14 @@ class Ghost(Sprite, ABC):
         ...
         
     def get_target_pacman_dir(self, pacman_rect: tuple, 
-                              pacman_dir: tuple,
-                              look_ahead: int=4):
+                                    pacman_dir:  tuple,
+                                    look_ahead:  int=4):
         match pacman_dir:
             case "l":
                 target = (pacman_rect[0], pacman_rect[1] - look_ahead)
                 if target[1] < 0:
                     target = (pacman_rect[0], self.num_cols - look_ahead - 1)
                 return target
-            
             case "r":
                 target = (pacman_rect[0], pacman_rect[1] + look_ahead)
                 if target[1] > self.num_cols:
@@ -230,8 +216,8 @@ class Ghost(Sprite, ABC):
             if self.image != self.normal_image:
                 self.image = self.normal_image
             return
-        if self._game_state.power_event_trigger_time is not None and \
-                self.release_time > self._game_state.power_event_trigger_time:
+        if (self._game_state.power_event_trigger_time is not None and
+                self.release_time > self._game_state.power_event_trigger_time):
             return
         if self._game_state.is_pacman_powered:
             if self.image != self.blue_image:
@@ -251,26 +237,24 @@ class Ghost(Sprite, ABC):
         self.next_tile = None
         self.release_time = None
         self.is_scared = False
-        self.rect.x
         x, y = self._get_coords_from_idx(self._ghost_matrix_pos)
         self.rect = self.image.get_rect(topleft=(x, y))
         self.rect_x = x
         self.rect_y = y
         self._is_released = False
-        # self._creation_time = pytime.get_ticks()
         self._creation_step = self._game_state.step_count
 
     def check_collisions(self):
-        ghost_rect = Rect(self.rect.x, self.rect.y, 
-                          PACMAN[0]//2, PACMAN[1]//2)
-        pacman_coords = (self._game_state.pacman_rect[0],
-                         self._game_state.pacman_rect[1],
-                         self._game_state.pacman_rect[2]//2,
-                         self._game_state.pacman_rect[3]//2)
-        pacman_rect = Rect(pacman_coords)
+        ghost_rect = Rect(self.rect.x, self.rect.y, PACMAN[0] // 2, PACMAN[1] // 2)
+        pacman_rect = Rect(
+            self._game_state.pacman_rect[0],
+            self._game_state.pacman_rect[1],
+            self._game_state.pacman_rect[2] // 2,
+            self._game_state.pacman_rect[3] // 2
+        )
         if ghost_rect.colliderect(pacman_rect):
             if self.is_scared:
-                self.reset_ghost()  
+                self.reset_ghost()
                 self.sounds.play_sound("eat_ghost")
                 self._game_state.points += GHOST_POINT
             else:
@@ -286,26 +270,24 @@ class Ghost(Sprite, ABC):
         self.check_if_pacman_powered()
         self.check_collisions()
 
+
 class Blinky(Ghost):
     def determine_target(self):
         mode = self._game_state.ghost_mode
         match mode:
             case "scatter":
-                target = GHOST_SCATTER_TARGETS[self.name]
+                return GHOST_SCATTER_TARGETS[self.name]
             case "chase":
                 pacman_rect = self._game_state.pacman_rect
-                target = self._get_idx_from_coords((pacman_rect[0], pacman_rect[1]))
-        return target
-    
+                return self._get_idx_from_coords((pacman_rect[0], pacman_rect[1]))
+
+
 class Pinky(Ghost):
     def calculate_pacman_direction(self):
         pacman_dir = self._game_state.pacman_direction
         pacman_rect = self._game_state.pacman_rect
-        pacman_rect = self._get_idx_from_coords((pacman_rect[0], 
-                                                        pacman_rect[1]))
-        return self.get_target_pacman_dir(pacman_rect, 
-                                          pacman_dir,
-                                          )
+        pacman_rect = self._get_idx_from_coords((pacman_rect[0], pacman_rect[1]))
+        return self.get_target_pacman_dir(pacman_rect, pacman_dir)
 
     def determine_target(self):
         mode = self._game_state.ghost_mode
@@ -314,21 +296,20 @@ class Pinky(Ghost):
                 return GHOST_SCATTER_TARGETS[self.name]
             case "chase":
                 return self.calculate_pacman_direction()
-            
+
+
 class Inky(Ghost):
     def calculate_inky_target(self):
         pacman_rect = self._game_state.pacman_rect
         pacman_rect = self._get_idx_from_coords((pacman_rect[0], pacman_rect[1]))
         pacman_dir = self._game_state.pacman_direction
         blinky_cell = self._game_state.blinky_matrix_pos
-        inky_pacman_target = self.get_target_pacman_dir(pacman_rect,
-                                                        pacman_dir,
-                                                        2)
+        inky_pacman_target = self.get_target_pacman_dir(pacman_rect, pacman_dir, 2)
         vec_row = inky_pacman_target[0] - blinky_cell[0]
         vec_col = inky_pacman_target[1] - blinky_cell[1]
         target_row = blinky_cell[0] + vec_row * 2
         target_col = blinky_cell[1] + vec_col * 2
-        return target_row, target_col  
+        return target_row, target_col
 
     def determine_target(self):
         mode = self._game_state.ghost_mode
@@ -337,7 +318,8 @@ class Inky(Ghost):
                 return GHOST_SCATTER_TARGETS[self.name]
             case "chase":
                 return self.calculate_inky_target()
-            
+
+
 class Clyde(Ghost):
     def get_clyde_random_target(self):
         pacman_rect = self._game_state.pacman_rect
@@ -374,12 +356,11 @@ class GhostManager:
         self.load_ghosts()
     
     def load_ghosts(self):
-        # ghost_pos = self.ghost_matrix_pos
         adder = 0
-        ghosts = [('blinky', Blinky), 
-                  ('pinky', Pinky), 
-                  ('inky', Inky), 
-                  ('clyde', Clyde)]
+        ghosts = [('blinky', Blinky),
+                  ('pinky',  Pinky),
+                  ('inky',   Inky),
+                  ('clyde',  Clyde)]
         for ghost_name, ghost in ghosts:
             ghost_pos = (self.ghost_matrix_pos[0], self.ghost_matrix_pos[1] + adder)
             self.ghosts_list.append(ghost(ghost_name,

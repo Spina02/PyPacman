@@ -1,5 +1,6 @@
-from src.configs import DOT_POINT
 import numpy as np
+
+from src.configs import DOT_POINT
 
 class GameState:
     def __init__(self):
@@ -29,7 +30,7 @@ class GameState:
         self._mins_played = 0
         self._points = -DOT_POINT
         self._level_complete = False
-        self.level_matrix_np = None  # Numpy array of the level matrix
+        self.level_matrix_np = None
         self._step_count = 0
         self.tile_encoding = {
             "wall": 0,
@@ -43,7 +44,6 @@ class GameState:
     @property
     def level_complete(self):
         return self._level_complete
-    
     @level_complete.setter
     def level_complete(self, val):
         self._level_complete = val
@@ -51,7 +51,6 @@ class GameState:
     @property
     def points(self):
         return self._points
-    
     @points.setter
     def points(self, val):
         self._points = val
@@ -59,7 +58,6 @@ class GameState:
     @property
     def highscore(self):
         return self._highscore
-    
     @highscore.setter
     def highscore(self, val):
         self._highscore = val
@@ -67,7 +65,6 @@ class GameState:
     @property
     def mins_played(self):
         return self._mins_played
-    
     @mins_played.setter
     def mins_played(self, val):
         self._mins_played = val
@@ -75,7 +72,6 @@ class GameState:
     @property
     def is_pacman_dead(self):
         return self._is_pacman_dead
-    
     @is_pacman_dead.setter
     def is_pacman_dead(self, val):
         self._is_pacman_dead = val
@@ -83,7 +79,6 @@ class GameState:
     @property
     def power_event_trigger_time(self):
         return self._power_event_trigger_time
-    
     @power_event_trigger_time.setter
     def power_event_trigger_time(self, val):
         self._power_event_trigger_time = val
@@ -91,7 +86,6 @@ class GameState:
     @property
     def power_up_event(self):
         return self._power_up_event
-    
     @power_up_event.setter
     def power_up_event(self, val):
         self._power_up_event = val
@@ -99,7 +93,6 @@ class GameState:
     @property
     def scared_time(self):
         return self._scared_time
-    
     @scared_time.setter
     def scared_time(self, val):
         self._scared_time = val
@@ -107,7 +100,6 @@ class GameState:
     @property
     def blinky_matrix_pos(self):
         return self._blinky_matrix_pos
-    
     @blinky_matrix_pos.setter
     def blinky_matrix_pos(self, val):
         self._blinky_matrix_pos = val
@@ -115,7 +107,6 @@ class GameState:
     @property
     def pacman_direction(self):
         return self._pacman_direction
-    
     @pacman_direction.setter
     def pacman_direction(self, val):
         self._pacman_direction = val
@@ -123,7 +114,6 @@ class GameState:
     @property
     def custom_event(self):
         return self._custom_event
-    
     @custom_event.setter
     def custom_event(self, val):
         self._custom_event = val
@@ -136,7 +126,6 @@ class GameState:
             curr_event = self._mode_change_events[self.__current_mode_index]
             self.__current_mode_index += 1
         return curr_event
-
     @mode_change_events.setter
     def mode_change_events(self, val):
         self._mode_change_events = val
@@ -144,7 +133,6 @@ class GameState:
     @property
     def ghost_mode(self):
         return self._ghost_mode
-    
     @ghost_mode.setter
     def ghost_mode(self, value):
         if value not in ['scatter', 'chase', 'scared']:
@@ -154,7 +142,6 @@ class GameState:
     @property
     def is_pacman_powered(self):
         return self.__is_pacman_powered
-    
     @is_pacman_powered.setter
     def is_pacman_powered(self, val):
         self.__is_pacman_powered = val
@@ -176,15 +163,13 @@ class GameState:
     @property
     def pacman_rect(self):
         return self.__pacman_rect
-    
     @pacman_rect.setter
     def pacman_rect(self, rect):
         self.__pacman_rect = rect
-    
+
     @property
     def current_time(self):
         return self.__current_time
-    
     @current_time.setter
     def current_time(self, val):
         self.__current_time = val
@@ -192,7 +177,6 @@ class GameState:
     @property
     def direction(self):
         return self.__direction
-
     @direction.setter
     def direction(self, value):
         if value not in ["r", "l", "u", "d", ""]:
@@ -202,7 +186,6 @@ class GameState:
     @property
     def level(self):
         return self.__level
-
     @level.setter
     def level(self, value):
         self.__level = value
@@ -210,7 +193,6 @@ class GameState:
     @property
     def running(self):
         return self.__running
-
     @running.setter
     def running(self, value):
         self.__running = value
@@ -218,7 +200,6 @@ class GameState:
     @property
     def fps(self):
         return self.__fps
-
     @fps.setter
     def fps(self, value):
         self.__fps = value
@@ -230,15 +211,13 @@ class GameState:
     @property
     def start_pos(self):
         return self._start_pos
-    
     @start_pos.setter
     def start_pos(self, pos):
         self._start_pos = pos
-        
+
     @property
     def step_count(self):
         return self._step_count
-    
     @step_count.setter
     def step_count(self, val):
         self._step_count = val
@@ -256,7 +235,6 @@ class GameState:
         timer =  self.__mode_timer
         self.__mode_timer -= 1
         return timer
-    
     @mode_timer.setter
     def mode_timer(self, val):
         self.__mode_timer = val
@@ -264,7 +242,6 @@ class GameState:
     @property
     def sound_enabled(self):
         return self._sound_enabled
-    
     @sound_enabled.setter
     def sound_enabled(self, val):
         self._sound_enabled = val

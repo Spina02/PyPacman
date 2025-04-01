@@ -1,22 +1,18 @@
 import json
+import os
 
 from src.configs import *
 from src.sprites.pacman import Pacman
 from src.sprites.ghosts import GhostManager
-from src.utils.coord_utils import (get_coords_from_idx, place_elements_offset,
-                                   precompute_matrix_coords)
-from src.utils.draw_utils import (draw_circle, draw_debug_rects, draw_rect)
-from src.log_handle import get_logger
-logger = get_logger(__name__)
+from src.utils.coord_utils import place_elements_offset, precompute_matrix_coords
+from src.utils.draw_utils import draw_circle, draw_debug_rects, draw_rect
 
 class PacmanGrid:
     def __init__(self, screen, game_state):
-        logger.info("initializing pacman grid")
         self.function_mapper = {
             "void": self.draw_void,
             "wall": self.draw_wall,
             "dot": self.draw_dot,
-            "spoint": self.draw_special_point,
             "power": self.draw_power,
             "null": self.draw_void,
             "elec": self.draw_elec,
@@ -25,7 +21,6 @@ class PacmanGrid:
         self._game_state = game_state
         self._level_number = self._game_state.level
         self.load_level(self._level_number)
-        logger.info("level loaded")
         self.pacman = Pacman(
             self._screen,
             self._game_state,
@@ -40,7 +35,6 @@ class PacmanGrid:
             self.ghost_den,
             (self.start_x, self.start_y)
         )
-        logger.info("pacman created")
         
     def get_json(self, path):
         with open(path) as fp:
@@ -59,7 +53,7 @@ class PacmanGrid:
         self._pacman_pos = level_json["pacman_start"]
         self.elec_pos = level_json['elec']
         self.mode_change_times = level_json['scatter_times']
-        self.power_up_time = (level_json['power_up_time'] * self._game_state.fps // 1000) # convert to frames
+        self.power_up_time = (level_json['power_up_time'] * self._game_state.fps // 1000)
         self._game_state.scared_time = self.power_up_time
         self._game_state.mode_change_events = self.mode_change_times
  
@@ -71,14 +65,15 @@ class PacmanGrid:
             0.5,
             0.5,
         )
-        self._game_state.start_pos = self.start_x, self.start_y
+        self._game_state.start_pos = (self.start_x, self.start_y)
         self._coord_matrix = precompute_matrix_coords(
             self.start_x, self.start_y, CELL_SIZE[0], num_rows, num_cols
         )
         self.num_rows = num_rows
         self.num_cols = num_cols
 
-    def draw_void(self, **kwargs): ...
+    def draw_void(self, **kwargs):
+        pass
 
     def draw_wall(self, **kwargs):
         draw_rect(
@@ -95,8 +90,6 @@ class PacmanGrid:
         dot_y = kwargs["y"] + kwargs["h"]
         draw_rect(dot_x, dot_y, 5, 5, self._screen, Colors.WHITE)
 
-    def draw_special_point(self): ...
-
     def draw_power(self, **kwargs):
         circle_x = kwargs["x"] + kwargs["w"]
         circle_y = kwargs["y"] + kwargs["h"]
@@ -107,8 +100,8 @@ class PacmanGrid:
 
     def draw_level(self):
         curr_x, curr_y = self.start_x, self.start_y
-        for _, row in enumerate(self._matrix):
-            for _, col in enumerate(row):
+        for row in self._matrix:
+            for col in row:
                 draw_func = self.function_mapper[col]
                 draw_func(x=curr_x, y=curr_y, w=CELL_SIZE[0], h=CELL_SIZE[0])
                 curr_x += CELL_SIZE[0]
