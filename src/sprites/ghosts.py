@@ -58,6 +58,7 @@ class Ghost(Sprite, ABC):
             (0, -1): (0, 1)
         }
         self.is_scared = False
+        self._game_state.scared_ghosts[self._game_state.ghost_encoding[self.name]] = False
         self.curr_pos = None
         self.release_time = None
         self.sounds = SoundManager(self._game_state.sound_enabled)
@@ -99,7 +100,7 @@ class Ghost(Sprite, ABC):
         return x, y
     
     def check_is_released(self):
-        if self._is_released:
+        if self._game_state.no_ghosts or self._is_released:
             return
         curr_time = self._game_state.step_count
         if (curr_time - self._creation_step) > self._dead_wait:
@@ -228,6 +229,7 @@ class Ghost(Sprite, ABC):
             if self.image != self.normal_image:
                 self.image = self.normal_image
                 self.is_scared = False
+                self._game_state.scared_ghosts[self._game_state.ghost_encoding[self.name]] = False
 
     def reset_ghost(self):
         self._t = 0
@@ -238,6 +240,7 @@ class Ghost(Sprite, ABC):
         self.next_tile = None
         self.release_time = None
         self.is_scared = False
+        self._game_state.scared_ghosts[self._game_state.ghost_encoding[self.name]] = False
         x, y = self._get_coords_from_idx(self._ghost_matrix_pos)
         self.rect = self.image.get_rect(topleft=(x, y))
         self.rect_x = x

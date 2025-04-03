@@ -33,6 +33,7 @@ class GameState:
         self._level_complete = False
         self.level_matrix_np = None
         self._step_count = 0
+        self._no_ghosts = False
         self.tile_encoding = {
             "wall": 0,
             "dot": 1,
@@ -259,7 +260,13 @@ class GameState:
     @scared_ghosts.setter
     def scared_ghosts(self, val):
         self._scared_ghosts = val
-    
+        
+    @property
+    def no_ghosts(self):
+        return self._no_ghosts
+    @no_ghosts.setter
+    def no_ghosts(self, val):
+        self._no_ghosts = val
     
     #? -------------------------------------------
     #?              Custom methods
