@@ -142,7 +142,7 @@ class Pacman(Sprite):
         CUSTOM_EVENT = USEREVENT + 2
         set_timer(CUSTOM_EVENT, self.game_state.scared_time)
         self.game_state.power_up_event = CUSTOM_EVENT
-        self.game_state.is_pacman_powered = True
+        self.game_state.is_pacman_powered = self.game_state.scared_time
         self.game_state.power_event_trigger_time = self.game_state.step_count
 
     def eat_dots(self):

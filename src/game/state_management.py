@@ -14,7 +14,7 @@ class GameState:
         self.__pacman_rect = None
         self.__ghost_pos = {}
         self.__is_loaded = False
-        self.__is_pacman_powered = False
+        self.__is_pacman_powered = 0
         self._ghost_mode = 'chase'
         self._mode_change_events = None
         self.__current_mode_index = 0

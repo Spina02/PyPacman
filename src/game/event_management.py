@@ -32,9 +32,11 @@ class EventHandler:
 
         # Check for power-up expiration
         if self._game_screen.is_pacman_powered:
-            power_duration = self._game_screen.scared_time
-            if self._game_screen.step_count >= self._game_screen.power_event_trigger_time + power_duration:
-                self._game_screen.is_pacman_powered = False
+            self._game_screen.is_pacman_powered -= 1
+            # power_duration = self._game_screen.scared_time
+            # if self._game_screen.step_count >= self._game_screen.power_event_trigger_time + power_duration:
+        else:
+            self._game_screen.is_pacman_powered = 0
 
     def handle_events(self, event, manual=True):
         if event.type == QUIT:
