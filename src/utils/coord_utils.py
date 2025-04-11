@@ -38,6 +38,11 @@ def get_idx_from_coords(x_coord, y_coord, start_x, start_y, cell_size):
     y_pos = int((y_coord - start_y) // cell_size)
     return y_pos, x_pos  # in matrix, horizontal is columns and vertical are rows
 
+def get_float_idx_from_coords(x_coord, y_coord, start_x, start_y, cell_size):
+    x_pos = (x_coord - start_x) / cell_size
+    y_pos = (y_coord - start_y) / cell_size
+    return y_pos, x_pos  # in matrix, horizontal is columns and vertical are rows
+
 def get_tiny_matrix(matrix, cell_size, pacman_speed):
     sub_div = cell_size // pacman_speed
     num_rows = len(matrix)
