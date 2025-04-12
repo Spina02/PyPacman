@@ -33,7 +33,6 @@ class GameState:
         self._level_complete = False
         self.level_matrix_np = None
         self._step_count = 0
-        self._no_ghosts = False
         self.tile_encoding = {
             "wall": 0,
             "dot": 1,
@@ -48,6 +47,7 @@ class GameState:
             "clyde": 3
         }
         self.tile_decoding = {v: k for k, v in self.tile_encoding.items()}
+        self._no_ghosts = {name : False for name in self.ghost_encoding.keys()}
 
     @property
     def level_complete(self):

@@ -100,7 +100,7 @@ class Ghost(Sprite, ABC):
         return x, y
     
     def check_is_released(self):
-        if self._game_state.no_ghosts or self._is_released:
+        if self._game_state.no_ghosts[self.name] or self._is_released:
             return
         curr_time = self._game_state.step_count
         if (curr_time - self._creation_step) > self._dead_wait:
