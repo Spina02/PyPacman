@@ -18,7 +18,7 @@ import random
 
 from src.game.state_management import GameState
 from src.sprites.sprite_configs import GHOST_PATHS
-from src.configs import PACMAN, CELL_SIZE, GHOST_DELAYS, GHOST_SCATTER_TARGETS, GHOST_POINT
+from src.configs import PACMAN, CELL_SIZE, GHOST_DELAYS, GHOST_SCATTER_TARGETS, GHOST_POINT, GHOST_SPEED_FAST, GHOST_SPEED_SLOW, GHOST_NORMAL_DELAY
 from src.utils.coord_utils import get_coords_from_idx, get_idx_from_coords
 from src.utils.ghost_movement_utils import get_direction, get_is_intersection, get_is_move_valid
 from src.sounds import SoundManager
@@ -46,7 +46,7 @@ class Ghost(Sprite, ABC):
                                       "right": (0, 2), "left": (0, -1)}
         self.prev_pos = None
         self._t = 0
-        self._accelerate = 0.2
+        self._accelerate = GHOST_SPEED_FAST / CELL_SIZE[0]
         self._direction = None
         self._target = None
         self.prev = None
@@ -105,7 +105,7 @@ class Ghost(Sprite, ABC):
         curr_time = self._game_state.step_count
         if (curr_time - self._creation_step) > self._dead_wait:
             self._is_released = True
-            self._dead_wait = 1500 * self._game_state.fps // 1000
+            self._dead_wait = GHOST_NORMAL_DELAY * self._game_state.fps // 1000
             self.rect_x, self.rect_y = self._get_coords_from_idx((11, self._ghost_matrix_pos[1]))
             self.release_time = self._game_state.step_count
 
@@ -157,6 +157,34 @@ class Ghost(Sprite, ABC):
             self.next_tile = (self.next_tile[0], 0)
         elif self.next_tile[1] < 0:
             self.next_tile = (self.next_tile[0], self.num_cols - 1)
+            
+    # In classe Ghost
+    def _boundary_check(self):
+        if not self.next_tile:
+            return
+        
+        teleported = False
+        
+        # Da destra a sinistra
+        if self.next_tile[1] >= self.num_cols:
+            self.next_tile = (self.next_tile[0], 0)
+            teleported = True
+        # Da sinistra a destra
+        elif self.next_tile[1] < 0:
+            self.next_tile = (self.next_tile[0], self.num_cols - 1)
+            teleported = True
+            
+        if teleported:
+            # Se c'è stato un teletrasporto, aggiorna immediatamente le coordinate in pixel
+            # per evitare il LERP attraverso la mappa.
+            new_coords = self._get_coords_from_idx(self.next_tile)
+            self.rect_x, self.rect_y = new_coords
+            
+            # Aggiorna anche la posizione "precedente" per il prossimo LERP
+            self.prev = self.next_tile
+            
+            # Potrebbe essere necessario ricalcolare la mossa successiva da qui
+            self.prepare_movement() 
 
     def prepare_movement(self):
         ghost_x, ghost_y = self._get_idx_from_coords((self.rect_x, self.rect_y))
@@ -217,17 +245,20 @@ class Ghost(Sprite, ABC):
         if not self._is_released:
             if self.image != self.normal_image:
                 self.image = self.normal_image
+                self._accelerate = GHOST_SPEED_FAST / CELL_SIZE[0]
             return
         if (self._game_state.power_event_trigger_time is not None and
                 self.release_time > self._game_state.power_event_trigger_time):
             return
         if self._game_state.is_pacman_powered:
-            if self.image != self.blue_image:
+            if not self.is_scared:
                 self.image = self.blue_image
+                self._accelerate = GHOST_SPEED_SLOW / CELL_SIZE[0]
                 self.make_ghost_scared()
         else:
-            if self.image != self.normal_image:
+            if self.is_scared:
                 self.image = self.normal_image
+                self._accelerate = GHOST_SPEED_FAST / CELL_SIZE[0]
                 self.is_scared = False
                 self._game_state.scared_ghosts[self._game_state.ghost_encoding[self.name]] = False
 

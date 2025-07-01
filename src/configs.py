@@ -17,8 +17,8 @@ NUM_COLS = 33
 PACMAN = (32, 32)
 GHOSTS = (32, 32)
 PACMAN_SPEED = 4
-GHOST_SPEED_FAST = 5
-GHOST_SPEED_SLOW = 2
+GHOST_SPEED_FAST = 3.5
+GHOST_SPEED_SLOW = 3
 GHOST_NORMAL_DELAY = 5000
 
 DOT_POINT = 10
@@ -27,10 +27,10 @@ GHOST_POINT = 25
 LEVEL_COMP_POINT = 80
 
 GHOST_DELAYS = {
-    "inky": 12000,
-    "pinky": 8000,
-    "blinky": 4000,
-    "clyde": 16000,
+    "inky": 15000,
+    "pinky": 10000,
+    "blinky": 5000,
+    "clyde": 20000,
     "blue": 0
 }
 GHOST_TARGET_CHANGE = {
