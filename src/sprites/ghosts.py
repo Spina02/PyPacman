@@ -149,14 +149,6 @@ class Ghost(Sprite, ABC):
                 return "left"
             case (0, 1):
                 return "right"
-      
-    def _boundary_check(self):
-        if not self.next_tile:
-            return
-        if self.next_tile[1] >= self.num_cols:
-            self.next_tile = (self.next_tile[0], 0)
-        elif self.next_tile[1] < 0:
-            self.next_tile = (self.next_tile[0], self.num_cols - 1)
             
     # In classe Ghost
     def _boundary_check(self):
