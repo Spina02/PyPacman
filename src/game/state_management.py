@@ -3,10 +3,10 @@ import numpy as np
 from src.configs import DOT_POINT
 
 class GameState:
-    def __init__(self):
+    def __init__(self, level = 1):
         self._sound_enabled = True
         self._start_pos = None
-        self.__level = 1
+        self.__level = level
         self.__running = True
         self.__fps = 60
         self.__direction = ""

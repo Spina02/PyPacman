@@ -63,6 +63,7 @@ class Ghost(Sprite, ABC):
         self.release_time = None
         self.sounds = SoundManager(self._game_state.sound_enabled)
         self.load_images()
+        self.ghost_order = ['blinky', 'pinky', 'inky', 'clyde']
 
     def _get_coords_from_idx(self, p1):
         return get_coords_from_idx(p1, *self._grid_start_pos, 

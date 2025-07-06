@@ -1192,7 +1192,7 @@
     "ghost_den": [14, 15],
     "elec": [11, 15],
     "extra_voids": [],
-    "scatter_times": [0, 100, 0, 100, 0, 100, 0],
+    "scatter_times": [0, 10, 10, 10, 10, 10, 10],
     "num_rows": 32,
     "num_cols": 35,
     "cell_width": 20,
