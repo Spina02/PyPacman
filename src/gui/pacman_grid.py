@@ -8,7 +8,7 @@ from src.utils.coord_utils import place_elements_offset, precompute_matrix_coord
 from src.utils.draw_utils import draw_circle, draw_debug_rects, draw_rect
 
 class PacmanGrid:
-    def __init__(self, screen, game_state):
+    def __init__(self, screen, game_state, pacman_pos = None):
         self.function_mapper = {
             "void": self.draw_void,
             "wall": self.draw_wall,
@@ -20,6 +20,7 @@ class PacmanGrid:
         self._screen = screen
         self._game_state = game_state
         self._level_number = self._game_state.level
+        self._pacman_pos = pacman_pos
         self.load_level(self._level_number)
         self.pacman = Pacman(
             self._screen,
@@ -50,7 +51,8 @@ class PacmanGrid:
         self.ghost_den = level_json['ghost_den']
         self._matrix = level_json["matrix"]
         self._game_state.set_level_matrix(self._matrix)
-        self._pacman_pos = level_json["pacman_start"]
+        if self._pacman_pos is None:
+            self._pacman_pos = level_json["pacman_start"]
         self.elec_pos = level_json['elec']
         self.mode_change_times = level_json['scatter_times']
         self.power_up_time = (level_json['power_up_time'] * self._game_state.fps // 1000)

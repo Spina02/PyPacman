@@ -5,11 +5,12 @@ from src.gui.score_screen import ScoreScreen
 from pygame.time import wait
 
 class ScreenManager:
-    def __init__(self, screen, game_state, all_sprites):
+    def __init__(self, screen, game_state, all_sprites, pacman_pos = None):
         self._screen = screen
         self._game_state = game_state
         self.all_sprites = all_sprites
-        self.pacman = PacmanGrid(screen, game_state)
+        self.pacman_pos = pacman_pos
+        self.pacman = PacmanGrid(screen, game_state, pacman_pos)
         self.score_screen = ScoreScreen(self._screen, self._game_state)
         self.all_sprites.add(self.pacman.pacman)
         for ghost in self.pacman.ghost.ghosts_list:
@@ -30,7 +31,7 @@ class ScreenManager:
         if self._game_state.level_complete:
             wait(2000)
             self.all_sprites.empty()
-            self.pacman = PacmanGrid(self._screen, self._game_state)
+            self.pacman = PacmanGrid(self._screen, self._game_state, self.pacman_pos)
             self.score_screen = ScoreScreen(self._screen, self._game_state)
             self.all_sprites.add(self.pacman.pacman)
             for ghost in self.pacman.ghost.ghosts_list:
